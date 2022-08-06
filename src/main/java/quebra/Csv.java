@@ -5,32 +5,22 @@ import java.io.FileReader;
 import com.opencsv.CSVReader;
 
 public class Csv {
-    public static void readDataLineByLine(String file)
-{
-  
-    try {
-  
-        // Create an object of filereader
-        // class with CSV file as a parameter.
-        FileReader filereader = new FileReader(file);
-  
-        // create csvReader object passing
-        // file reader as a parameter
-        CSVReader csvReader = new CSVReader(filereader);
-        String[] nextRecord;
-  
-        // we are going to read data line by line
-        while ((nextRecord = csvReader.readNext()) != null) {
-            for (String cell : nextRecord) {
-                System.out.print(cell + "\t");
-            }
-            System.out.println();
-        }
+    public static void lerHistorico(String file) {
+        try {
+            FileReader filereader = new FileReader(file);
+            CSVReader csvReader = new CSVReader(filereader);
+            String[] nextRecord;
 
-        csvReader.close();
+            while ((nextRecord = csvReader.readNext()) != null) {
+                for (String cell : nextRecord) {
+                    System.out.print(cell + "\t");
+                }
+                System.out.println();
+            }
+
+            csvReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    catch (Exception e) {
-        e.printStackTrace();
-    }
-}
 }
