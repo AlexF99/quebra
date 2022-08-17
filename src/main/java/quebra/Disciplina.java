@@ -14,15 +14,16 @@ public class Disciplina {
             String nomeDisciplina,
             String codDisciplina,
             int cargaHoraria,
-            int numVersao,
-            int tipoDisciplina) {
+            int numVersao
+            // int tipoDisciplina
+            ) {
         this.codCurso = codCurso;
         this.nomeCurso = nomeCurso;
         this.nomeDisciplina = nomeDisciplina;
         this.codDisciplina = codDisciplina;
         this.cargaHoraria = cargaHoraria;
         this.numVersao = numVersao;
-        this.tipoDisciplina = tipoDisciplina;
+        // this.tipoDisciplina = tipoDisciplina;
     }
 
     // getters

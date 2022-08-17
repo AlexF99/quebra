@@ -5,19 +5,20 @@ public class Ofertada extends Disciplina {
     int versaoDescSituacao;
     int numHoras;
 
-    public Ofertada(String codCurso,
+    public Ofertada(
+            String codCurso,
             String nomeCurso,
             String nomeDisciplina,
             String codDisciplina,
             int cargaHoraria,
             int numVersao,
-            int tipoDisciplina,
+            // int tipoDisciplina,
             int periodoIdeal,
-            int versaoDescSituacao,
+            // int versaoDescSituacao,
             int numHoras) {
-        super(codCurso, nomeCurso, nomeDisciplina, codDisciplina, cargaHoraria, numVersao, tipoDisciplina);
+        super(codCurso, nomeCurso, nomeDisciplina, codDisciplina, cargaHoraria, numVersao /*tipoDisciplina*/);
         this.periodoIdeal = periodoIdeal;
-        this.versaoDescSituacao = versaoDescSituacao;
+        // this.versaoDescSituacao = versaoDescSituacao;
         this.numHoras = numHoras;
     }
 
