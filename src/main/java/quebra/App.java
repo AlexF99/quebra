@@ -4,16 +4,19 @@ public class App
 {
     public static void main( String[] args )
     {
-        ListaCursadas.leCursadas("./csvs/historico.csv");
-        ListaOfertadas.leOfertadas("./csvs/2019_2.csv");
+        ListaCursadas listaCursadas = ListaCursadas.getInstance();
+        ListaOfertadas listaOfertadas = ListaOfertadas.getInstance();
+
+        listaCursadas.leCursadas("./csvs/historico.csv");
+        listaOfertadas.leOfertadas("./csvs/2019_2.csv");
         
-        for (Ofertada ofertada : ListaOfertadas.listaOfertadas) {
+        for (Ofertada ofertada : listaOfertadas.lista) {
             System.out.println(ofertada.getNomeDisciplina());
         }
 
         System.out.println();
 
-        for (Cursada cursada : ListaCursadas.listaCursadas) {
+        for (Cursada cursada : listaCursadas.lista) {
             System.out.println(cursada.getNomeDisciplina());
         }
         

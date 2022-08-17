@@ -7,26 +7,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListaCursadas {
-    static List<Cursada> listaCursadas = new ArrayList<>();
+    private static ListaCursadas uniqueInstance;
 
-    public static void leCursadas(String file) {
+    private ListaCursadas() {
+    }
+
+    public static synchronized ListaCursadas getInstance() {
+        if (uniqueInstance == null) {
+            uniqueInstance = new ListaCursadas();
+        }
+        return uniqueInstance;
+    }
+
+    List<Cursada> lista = new ArrayList<>();
+
+    public void leCursadas(String file) {
         try {
             FileReader filereader = new FileReader(file);
             CSVReader csvReader = new CSVReader(filereader);
-            
+
             String[] nextRecord;
-            
+
             // Joga "fora" o cabeçalho da tabela
             nextRecord = csvReader.readNext();
             nextRecord = csvReader.readNext();
-            
+
             while ((nextRecord = csvReader.readNext()) != null) {
                 for (String cell : nextRecord) {
                     String[] data = cell.split(";", -1);
 
                     if (data.length > 0) {
 
-                        //TODO: Adicionar campos faltantes
+                        // TODO: Adicionar campos faltantes
                         String codCurso = data[2];
                         String nomeCurso = data[3];
                         String nomeDisciplina = data[11];
@@ -45,34 +57,32 @@ public class ListaCursadas {
                         int frequencia = !data[14].equals("") ? Integer.parseInt(data[14]) : 0;
                         String sigla = data[15];
 
-
                         Cursada cursada = new Cursada(
-                            codCurso,
-                            nomeCurso,
-                            nomeDisciplina,
-                            codDisciplina, 
-                            cargaHoraria, 
-                            numVersao,  
-                            grr,
-                            nomeAluno, 
-                            periodo, 
-                            ano,
-                            situacao,
-                            media,
-                            frequencia,
-                            sigla
-                        );
+                                codCurso,
+                                nomeCurso,
+                                nomeDisciplina,
+                                codDisciplina,
+                                cargaHoraria,
+                                numVersao,
+                                grr,
+                                nomeAluno,
+                                periodo,
+                                ano,
+                                situacao,
+                                media,
+                                frequencia,
+                                sigla);
 
-                        listaCursadas.add(cursada);
+                        lista.add(cursada);
                     }
                 }
             }
-    
-            csvReader.close();            
-    
+
+            csvReader.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
 }
