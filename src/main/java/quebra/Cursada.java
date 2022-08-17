@@ -10,13 +10,14 @@ public class Cursada extends Disciplina {
     int media;
     int frequencia;
 
-    public Cursada(String codCurso,
+    public Cursada(
+            String codCurso,
             String nomeCurso,
             String nomeDisciplina,
             String codDisciplina,
             int cargaHoraria,
             int numVersao,
-            int tipoDisciplina,
+            // int tipoDisciplina,
             String grr,
             String nomeAluno,
             int periodo,
@@ -25,7 +26,7 @@ public class Cursada extends Disciplina {
             int media,
             int frequencia,
             String sigla) {
-        super(codCurso, nomeCurso, nomeDisciplina, codDisciplina, cargaHoraria, numVersao, tipoDisciplina);
+        super(codCurso, nomeCurso, nomeDisciplina, codDisciplina, cargaHoraria, numVersao);
         this.grr = grr;
         this.nomeAluno = nomeAluno;
         this.periodo = periodo;
