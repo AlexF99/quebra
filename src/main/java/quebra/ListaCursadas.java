@@ -33,47 +33,43 @@ public class ListaCursadas {
             nextRecord = csvReader.readNext();
 
             while ((nextRecord = csvReader.readNext()) != null) {
-                for (String cell : nextRecord) {
-                    String[] data = cell.split(";", -1);
+                if (nextRecord.length > 0) {
 
-                    if (data.length > 0) {
+                    String codCurso = nextRecord[2];
+                    String nomeCurso = nextRecord[3];
+                    String nomeDisciplina = nextRecord[11];
+                    String codDisciplina = nextRecord[10];
+                    int cargaHoraria = !nextRecord[12].equals("") ? Integer.parseInt(nextRecord[12]) : 0;
+                    int numVersao = !nextRecord[4].equals("") ? Integer.parseInt(nextRecord[4]) : 0;
 
-                        String codCurso = data[2];
-                        String nomeCurso = data[3];
-                        String nomeDisciplina = data[11];
-                        String codDisciplina = data[10];
-                        int cargaHoraria = !data[12].equals("") ? Integer.parseInt(data[12]) : 0;
-                        int numVersao = !data[4].equals("") ? Integer.parseInt(data[4]) : 0;
+                    String grr = nextRecord[0];
+                    String nomeAluno = nextRecord[1];
 
-                        String grr = data[0];
-                        String nomeAluno = data[1];
+                    String[] stringPeriodo = nextRecord[8].split("o");
+                    Integer periodo = Integer.parseInt((stringPeriodo[0]));
+                    int ano = !nextRecord[5].equals("") ? Integer.parseInt(nextRecord[5]) : 0;
+                    Integer situacao = !nextRecord[7].equals("") ? Integer.parseInt(nextRecord[7]) : 0;
+                    Integer media = !nextRecord[6].equals("") ? Integer.parseInt(nextRecord[6]) : 0;
+                    int frequencia = !nextRecord[14].equals("") ? Integer.parseInt(nextRecord[14]) : 0;
+                    String sigla = nextRecord[15];
 
-                        String[] stringPeriodo = data[8].split("o");
-                        Integer periodo = Integer.parseInt((stringPeriodo[0]));
-                        int ano = !data[5].equals("") ? Integer.parseInt(data[5]) : 0;
-                        Integer situacao = !data[7].equals("") ? Integer.parseInt(data[7]) : 0;
-                        Integer media = !data[6].equals("") ? Integer.parseInt(data[6]) : 0;
-                        int frequencia = !data[14].equals("") ? Integer.parseInt(data[14]) : 0;
-                        String sigla = data[15];
+                    Cursada cursada = new Cursada(
+                            codCurso,
+                            nomeCurso,
+                            nomeDisciplina,
+                            codDisciplina,
+                            cargaHoraria,
+                            numVersao,
+                            grr,
+                            nomeAluno,
+                            periodo,
+                            ano,
+                            situacao,
+                            media,
+                            frequencia,
+                            sigla);
 
-                        Cursada cursada = new Cursada(
-                                codCurso,
-                                nomeCurso,
-                                nomeDisciplina,
-                                codDisciplina,
-                                cargaHoraria,
-                                numVersao,
-                                grr,
-                                nomeAluno,
-                                periodo,
-                                ano,
-                                situacao,
-                                media,
-                                frequencia,
-                                sigla);
-
-                        lista.add(cursada);
-                    }
+                    lista.add(cursada);
                 }
             }
 
