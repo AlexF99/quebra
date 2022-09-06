@@ -4,9 +4,9 @@ public class Cursada extends Disciplina {
     String grr;
     String nomeAluno;
     String sigla;
-    int periodo;
+    Integer periodo;
     int ano;
-    int situacao;
+    Integer situacao;
     int media;
     int frequencia;
 
@@ -20,10 +20,10 @@ public class Cursada extends Disciplina {
             // int tipoDisciplina,
             String grr,
             String nomeAluno,
-            int periodo,
+            Integer periodo,
             int ano,
-            int situacao,
-            int media,
+            Integer situacao,
+            Integer media,
             int frequencia,
             String sigla) {
         super(codCurso, nomeCurso, nomeDisciplina, codDisciplina, cargaHoraria, numVersao);
@@ -50,7 +50,7 @@ public class Cursada extends Disciplina {
         return this.sigla;
     }
 
-    public int getPeriodo() {
+    public Integer getPeriodo() {
         return this.periodo;
     }
 
@@ -58,11 +58,27 @@ public class Cursada extends Disciplina {
         return this.ano;
     }
 
-    public int getSituacao() {
+    public Integer getSituacao() {
         return this.situacao;
     }
 
-    public int getMedia() {
+    public String getStrSituacao() {
+        switch (this.situacao) {
+            case 1:
+                return "aprovado";
+            case 2:
+                return "reprovado";
+            case 3:
+                return "reprovado";
+            case 10:
+                return "matricula";
+
+            default:
+                return "matricula";
+        }
+    }
+
+    public Integer getMedia() {
         return this.media;
     }
 
@@ -83,7 +99,7 @@ public class Cursada extends Disciplina {
         this.sigla = sigla;
     }
 
-    public void setPeriodo(int periodo) {
+    public void setPeriodo(Integer periodo) {
         this.periodo = periodo;
     }
 
@@ -91,11 +107,11 @@ public class Cursada extends Disciplina {
         this.ano = ano;
     }
 
-    public void setSituacao(int situacao) {
+    public void setSituacao(Integer situacao) {
         this.situacao = situacao;
     }
 
-    public void setMedia(int media) {
+    public void setMedia(Integer media) {
         this.media = media;
     }
 

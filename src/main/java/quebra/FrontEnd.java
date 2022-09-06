@@ -2,40 +2,65 @@ package quebra;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
+import java.util.ArrayList;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class FrontEnd extends JFrame implements ActionListener {
-    private JButton B1, B2;
-    private JLabel L1, L2, L3;
-    private JTextField T1, T2, T3;
+
+    private DefaultTableModel modelCursadas = new DefaultTableModel();
+
+    ListaCursadas listaCursadas = ListaCursadas.getInstance();
+    ListaOfertadas listaOfertadas = ListaOfertadas.getInstance();
 
     public FrontEnd() {
-        B1 = new JButton("Insere aluno");
-        B1.addActionListener(this);
-        L1 = new JLabel("Nome");
-        L2 = new JLabel("email");
-        L3 = new JLabel("grr");
-        T1 = new JTextField("Nome");
-        T2 = new JTextField("email");
-        T3 = new JTextField("GRR_____");
-        this.getContentPane().setLayout(new FlowLayout());
-        this.getContentPane().add(L1);
-        this.getContentPane().add(T1);
-        this.getContentPane().add(L2);
-        this.getContentPane().add(T2);
-        this.getContentPane().add(L3);
-        this.getContentPane().add(T3);
-        this.getContentPane().add(B1);
-        this.setLocation(200, 200);
-        this.setSize(500, 350);
+        JFrame f = new JFrame();
+
+        JScrollPane cursadasView = cursadas();
+        f.add(cursadasView);
+        f.setSize(600, 450);
+        f.setVisible(true);
+    }
+
+    private JScrollPane cursadas() {
+
+        List<String[]> data = new ArrayList<String[]>();
+
+        for (Cursada cursada : listaCursadas.lista) {
+            String disciplina[] = new String[3];
+            disciplina[0] = cursada.getCodCurso();
+            disciplina[1] = cursada.getNomeDisciplina();
+            disciplina[2] = cursada.getMedia().toString();
+            data.add(disciplina);
+        }
+
+        JTable cursadasTable = new JTable(modelCursadas);
+        modelCursadas.addColumn("codigo");
+        modelCursadas.addColumn("disciplina");
+        modelCursadas.addColumn("periodo");
+        modelCursadas.addColumn("media");
+        modelCursadas.addColumn("situação");
+
+        for (Cursada cursada : listaCursadas.lista) {
+            modelCursadas.addRow(
+                    new Object[] { cursada.getCodDisciplina(),
+                            cursada.getNomeDisciplina(),
+                            cursada.getPeriodo().toString(),
+                            cursada.getMedia().toString(),
+                            cursada.getStrSituacao() });
+        }
+
+        cursadasTable.setBounds(30, 40, 200, 300);
+        JScrollPane sp = new JScrollPane(cursadasTable);
+        return sp;
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == B1) {
-            String nome = T1.getText();
-            String email = T2.getText();
-            String grr = T3.getText();
-        }
+        // if (e.getSource() == B1) {
+        // String nome = T1.getText();
+        // }
     }
 
 }

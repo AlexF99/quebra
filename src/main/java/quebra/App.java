@@ -11,16 +11,6 @@ public class App
 
         listaCursadas.leCursadas("./csvs/historico.csv");
         listaOfertadas.leOfertadas("./csvs/2019_2.csv");
-        
-        for (Ofertada ofertada : listaOfertadas.lista) {
-            System.out.println(ofertada.getNomeDisciplina());
-        }
-
-        System.out.println();
-
-        for (Cursada cursada : listaCursadas.lista) {
-            System.out.println(cursada.getNomeDisciplina());
-        }
 
         JFrame janela = new FrontEnd();
 		janela.setVisible(true);
