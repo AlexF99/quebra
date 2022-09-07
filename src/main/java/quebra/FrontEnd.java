@@ -16,26 +16,18 @@ public class FrontEnd extends JFrame implements ActionListener {
     ListaOfertadas listaOfertadas = ListaOfertadas.getInstance();
 
     public FrontEnd() {
-        JFrame f = new JFrame();
+        // JFrame f = new JFrame();
 
-        JScrollPane cursadasView = cursadas();
-        f.add(cursadasView);
-        f.setSize(600, 450);
-        f.setVisible(true);
+        JTable cursadasView = cursadas();
+        JLabel aprovacao = aprovacaoUltimo();
+
+        this.getContentPane().add(cursadasView);
+        this.getContentPane().add(aprovacao);
+
+        this.setSize(600, 450);
     }
 
-    private JScrollPane cursadas() {
-
-        List<String[]> data = new ArrayList<String[]>();
-
-        for (Cursada cursada : listaCursadas.lista) {
-            String disciplina[] = new String[3];
-            disciplina[0] = cursada.getCodCurso();
-            disciplina[1] = cursada.getNomeDisciplina();
-            disciplina[2] = cursada.getMedia().toString();
-            data.add(disciplina);
-        }
-
+    private JTable cursadas() {
         JTable cursadasTable = new JTable(modelCursadas);
         modelCursadas.addColumn("codigo");
         modelCursadas.addColumn("disciplina");
@@ -44,17 +36,36 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelCursadas.addColumn("situação");
 
         for (Cursada cursada : listaCursadas.lista) {
-            modelCursadas.addRow(
-                    new Object[] { cursada.getCodDisciplina(),
-                            cursada.getNomeDisciplina(),
-                            cursada.getPeriodo().toString(),
-                            cursada.getMedia().toString(),
-                            cursada.getStrSituacao() });
+            if (cursada.getSituacao() != 10) {
+                modelCursadas.addRow(
+                        new Object[] { cursada.getCodDisciplina(),
+                                cursada.getNomeDisciplina(),
+                                cursada.getPeriodo().toString(),
+                                cursada.getMedia().toString(),
+                                cursada.getStrSituacao() });
+            }
         }
 
-        cursadasTable.setBounds(30, 40, 200, 300);
-        JScrollPane sp = new JScrollPane(cursadasTable);
-        return sp;
+        cursadasTable.setBounds(0, 0, 600, 200);
+        return cursadasTable;
+    }
+
+    private JLabel aprovacaoUltimo() {
+        JLabel label1 = new JLabel("aprovacao");
+        double ultimasAprovadas = 0;
+        double ultimasCursadas = 0;
+        for (Cursada cursada : listaCursadas.lista) {
+            if (cursada.getPeriodo() == 3) {
+                ultimasCursadas++;
+                if (cursada.getSituacao() == 1)
+                    ultimasAprovadas++;
+            }
+        }
+        double porcentagem = (double) (ultimasAprovadas / ultimasCursadas) * 100;
+        if (ultimasCursadas != 0) {
+            label1.setText("Aprovação no ultimo periodo: " + porcentagem + "%");
+        }
+        return label1;
     }
 
     public void actionPerformed(ActionEvent e) {

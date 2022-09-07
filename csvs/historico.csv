@@ -1,15 +1,15 @@
 MATR_ALUNO,NOME_PESSOA,COD_CURSO,NOME_CURSO,NUM_VERSAO,ANO,MEDIA_FINAL,SITUACAO_ITEM,PERIODO,SITUACAO,COD_ATIV_CURRIC,NOME_ATIV_CURRIC,CH_TOTAL,DESCR_ESTRUTURA,FREQUENCIA,SIGLA
 ,,,,,,,,,,,,,,,
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,70,1,1,Aprovado,CI055,ALGORITMOS E ESTRUTURAS DE DADOS I,60,Obrigatorias,100,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,100,1,1,Aprovado,CM201,CALCULO DIFERENCIAL E INTEGRAL I,60,Obrigatorias,100,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,75,1,1,Aprovado,CI068,CIRCUITOS DIGITAIS,60,Obrigatorias,100,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,30,2,2,Reprovado por nota,CM303,INTRODUCAO A GEOMETRIA ANALITICA E ALGEBRA LINEAR,60,Obrigatorias,93,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,85,1,2,Aprovado,CI056,ALGORITMOS E ESTRUTURAS DE DADOS II,60,Obrigatorias,96,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,72,1,2,Aprovado,CM202,CALCULO DIFERENCIAL E INTEGRAL II,60,Obrigatorias,75,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,91,1,2,Aprovado,CI067,OFICINA DE COMPUTACAO,60,Obrigatorias,100,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,65,1,2,Aprovado,CM303,INTRODUCAO A GEOMETRIA ANALITICA E ALGEBRA LINEAR,60,Obrigatorias,93,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,70,1,1,Aprovado,CI055,ALGORITMOS E ESTRUTURAS DE DADOS I,60,Obrigatorias,100,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,100,1,1,Aprovado,CM201,CALCULO DIFERENCIAL E INTEGRAL I,60,Obrigatorias,100,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,75,1,1,Aprovado,CI068,CIRCUITOS DIGITAIS,60,Obrigatorias,100,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,30,2,2,Reprovado por nota,CM303,INTRODUCAO A GEOMETRIA ANALITICA E ALGEBRA LINEAR,60,Obrigatorias,93,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,85,1,2,Aprovado,CI056,ALGORITMOS E ESTRUTURAS DE DADOS II,60,Obrigatorias,96,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,72,1,2,Aprovado,CM202,CALCULO DIFERENCIAL E INTEGRAL II,60,Obrigatorias,75,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,91,1,2,Aprovado,CI067,OFICINA DE COMPUTACAO,60,Obrigatorias,100,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,65,1,2,Aprovado,CM303,INTRODUCAO A GEOMETRIA ANALITICA E ALGEBRA LINEAR,60,Obrigatorias,93,Aprovado
 GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,82,1,3,Aprovado,CI057,ALGORITMOS E ESTRUTURAS DE DADOS III,60,Obrigatorias,93,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,30,3,3,Reprovado por Frequencia,CI237,MATEMATICA DISCRETA,60,Obrigatorias,40,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,28,2,3,Reprovado por nota,CI212,ARQUITETURA DE COMPUTADORES,60,Obrigatorias,90,Aprovado
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,9999,10,3,Matricula,CI237,MATEMATICA DISCRETA,60,Obrigatorias,,Matricula
-GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2019,9999,10,3,Matricula,CI212,ARQUITETURA DE COMPUTADORES,60,Obrigatorias,,Matricula
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,30,3,3,Reprovado por Frequencia,CI237,MATEMATICA DISCRETA,60,Obrigatorias,40,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,28,2,3,Reprovado por nota,CI212,ARQUITETURA DE COMPUTADORES,60,Obrigatorias,90,Aprovado
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,9999,10,4,Matricula,CI237,MATEMATICA DISCRETA,60,Obrigatorias,,Matricula
+GRR41561234,LUKE SKYWALKER,21A,Curso de Ciencia da Computacao - Bacharelado,2019,2020,9999,10,4,Matricula,CI212,ARQUITETURA DE COMPUTADORES,60,Obrigatorias,,Matricula
