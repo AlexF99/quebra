@@ -34,7 +34,7 @@ public class FrontEnd extends JFrame implements ActionListener {
         this.pack();
         this.setVisible(true);
 
-        this.setSize(600, 600);
+        this.setSize(700, 800);
     }
 
     private JTable cursadas() {
@@ -56,7 +56,7 @@ public class FrontEnd extends JFrame implements ActionListener {
             }
         }
 
-        cursadasTable.setBounds(100, 100, 500, 200);
+        cursadasTable.setBounds(100, 100, 500, 500);
         return cursadasTable;
     }
 
