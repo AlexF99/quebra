@@ -18,14 +18,23 @@ public class FrontEnd extends JFrame implements ActionListener {
 
     public FrontEnd() {
         JTable cursadasView = cursadas();
-        JLabel aprovacao = aprovacaoUltimo();
+        JLabel aprovacao = extraInfo();
         JTable faltantes = faltantes();
 
-        this.getContentPane().add(cursadasView);
-        this.getContentPane().add(aprovacao);
-        this.getContentPane().add(faltantes);
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
+        panel.setLayout(new GridLayout(0, 1));
+        panel.add(cursadasView);
+        panel.add(aprovacao);
+        panel.add(faltantes);
 
-        this.setSize(1000, 1000);
+        this.add(panel, BorderLayout.CENTER);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("pedido de quebra");
+        this.pack();
+        this.setVisible(true);
+
+        this.setSize(600, 600);
     }
 
     private JTable cursadas() {
@@ -51,20 +60,25 @@ public class FrontEnd extends JFrame implements ActionListener {
         return cursadasTable;
     }
 
-    private JLabel aprovacaoUltimo() {
+    private JLabel extraInfo() {
         JLabel label1 = new JLabel("aprovacao");
         double ultimasAprovadas = 0;
         double ultimasCursadas = 0;
+        int reprovacoesFalta = 0;
+
         for (Cursada cursada : listaCursadas.lista) {
             if (cursada.getPeriodo() == 3) {
                 ultimasCursadas++;
                 if (cursada.getSituacao() == 1)
                     ultimasAprovadas++;
             }
+
+            if (cursada.getSituacao() == 3)
+                reprovacoesFalta++;
         }
         double porcentagem = (double) (ultimasAprovadas / ultimasCursadas) * 100;
         if (ultimasCursadas != 0) {
-            label1.setText("Aprovação no ultimo periodo: " + porcentagem + "%");
+            label1.setText("Aprovação no ultimo periodo: " + porcentagem + "%" + " Reprovações por falta: " + reprovacoesFalta );
         }
         return label1;
     }
@@ -88,7 +102,7 @@ public class FrontEnd extends JFrame implements ActionListener {
                 aprovadas.add(cursada.getCodDisciplina());
         }
 
-        //pega faltantes
+        // pega faltantes
         List<String> faltantes = new ArrayList<>();
         for (String b : barreira)
             if (!aprovadas.contains(b))
@@ -102,7 +116,7 @@ public class FrontEnd extends JFrame implements ActionListener {
             }
         }
 
-        faltantesTable.setBounds(100, 100, 600, 200);
+        faltantesTable.setBounds(100, 100, 300, 180);
         return faltantesTable;
     }
 
