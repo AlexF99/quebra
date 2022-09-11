@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 public class FrontEnd extends JFrame implements ActionListener {
 
     private DefaultTableModel modelCursadas = new DefaultTableModel();
     private DefaultTableModel modelFaltantes = new DefaultTableModel();
+    private DefaultTableModel modelOfertadas = new DefaultTableModel();
+    private DefaultTableModel modelSelecionadas = new DefaultTableModel();
 
     ListaCursadas listaCursadas = ListaCursadas.getInstance();
     ListaOfertadas listaOfertadas = ListaOfertadas.getInstance();
@@ -20,13 +24,17 @@ public class FrontEnd extends JFrame implements ActionListener {
         JTable cursadasView = cursadas();
         JLabel aprovacao = extraInfo();
         JTable faltantes = faltantes();
-
+        JTable selecionadas = selecionadas();
+        final JTable ofertadas = ofertadas();
+        
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
         panel.setLayout(new GridLayout(0, 1));
-        panel.add(cursadasView);
-        panel.add(aprovacao);
-        panel.add(faltantes);
+        panel.add(new JScrollPane(cursadasView));
+        panel.add(new JScrollPane(aprovacao));
+        panel.add(new JScrollPane(faltantes));
+        panel.add(new JScrollPane(ofertadas));
+        panel.add(new JScrollPane(selecionadas));
 
         this.add(panel, BorderLayout.CENTER);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -34,7 +42,27 @@ public class FrontEnd extends JFrame implements ActionListener {
         this.pack();
         this.setVisible(true);
 
+        final ListSelectionModel selectionModel = ofertadas.getSelectionModel();
+        selectionModel.addListSelectionListener(new ListSelectionListener() {
+            int cliclCount = 0;
+            public void valueChanged(ListSelectionEvent event) {
+                if(!selectionModel.isSelectionEmpty() && cliclCount % 2 == 0){
+                    modelSelecionadas.addRow(
+                        new Object[] { ofertadas.getValueAt(ofertadas.getSelectedRow(), 0).toString(),
+                        });
+                    }
+                cliclCount++;
+            }
+        });
+        
         this.setSize(700, 800);
+    }
+
+    private JTable selecionadas() {
+        JTable selecionadasTable = new JTable(modelSelecionadas);
+        modelSelecionadas.addColumn("codigo");
+        selecionadasTable.setBounds(100, 100, 500, 500);
+        return selecionadasTable;
     }
 
     private JTable cursadas() {
@@ -60,6 +88,33 @@ public class FrontEnd extends JFrame implements ActionListener {
         return cursadasTable;
     }
 
+    private JTable ofertadas() {
+        JTable ofertadasTable = new JTable(modelOfertadas);
+        modelOfertadas.addColumn("codigo");
+        modelOfertadas.addColumn("nome");
+        modelOfertadas.addColumn("periodo ideal");
+        Boolean flag;
+
+        for (Ofertada ofertada : listaOfertadas.lista) {
+            flag = true;
+            for (Cursada cursada : listaCursadas.lista) {
+                if (ofertada.getCodDisciplina().equals(cursada.getCodDisciplina())) {
+                    flag = false;
+                }
+            }
+            if (flag) {
+                modelOfertadas.addRow(
+                        new Object[] { ofertada.getCodDisciplina(),
+                                ofertada.getNomeDisciplina(),
+                                ofertada.getperiodoIdeal(),
+                        });
+            }
+        }
+
+        ofertadasTable.setBounds(100, 100, 500, 500);
+        return ofertadasTable;
+    }
+
     private JLabel extraInfo() {
         JLabel label1 = new JLabel("aprovacao");
         double ultimasAprovadas = 0;
@@ -76,9 +131,10 @@ public class FrontEnd extends JFrame implements ActionListener {
             if (cursada.getSituacao() == 3)
                 reprovacoesFalta++;
         }
-        double porcentagem = (double) (ultimasAprovadas / ultimasCursadas) * 100;
+        String porcentagem = (String) String.format("%.2f", ((ultimasAprovadas / ultimasCursadas) * 100));
         if (ultimasCursadas != 0) {
-            label1.setText("Aprovação no ultimo periodo: " + porcentagem + "%" + " Reprovações por falta: " + reprovacoesFalta );
+            label1.setText("Aprovação no ultimo periodo: " + porcentagem + "%" + " Reprovações por falta: "
+                    + reprovacoesFalta);
         }
         return label1;
     }
