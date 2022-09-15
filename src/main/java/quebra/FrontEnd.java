@@ -2,6 +2,11 @@ package quebra;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,50 +15,96 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-public class FrontEnd extends JFrame implements ActionListener {
+import com.opencsv.CSVReader;
 
+public class FrontEnd extends JFrame implements ActionListener {
     private DefaultTableModel modelCursadas = new DefaultTableModel();
     private DefaultTableModel modelFaltantes = new DefaultTableModel();
     private DefaultTableModel modelOfertadas = new DefaultTableModel();
     private DefaultTableModel modelSelecionadas = new DefaultTableModel();
+    private JLabel status = new JLabel();
     private String desempenho = "";
+    private double ira = 0.0;
     ListaCursadas listaCursadas = ListaCursadas.getInstance();
     ListaOfertadas listaOfertadas = ListaOfertadas.getInstance();
-
     public FrontEnd() {
         JTable cursadas = cursadas();
         JLabel aprovacao = extraInfo();
         JTable faltantes = faltantes();
         final JTable selecionadas = selecionadas();
         final JTable ofertadas = ofertadas();
-
         JPanel panel = new JPanel();
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, 0));
         panel.setLayout(new BoxLayout(panel, 1));
-        JButton button = new JButton("Enviar");
-        button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        final JButton buttonEnviar = new JButton("Enviar");
+        JButton buttonSalvar = new JButton("Salvar");
+        buttonEnviar.setEnabled(verificaRegras());
+        // ação do botão enviar - Salva as disciplinas em um CSV
+        buttonEnviar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    FileWriter csv = new FileWriter(new File("selecionadasEnvio.csv"));
+                    for (int i = 0; i < modelSelecionadas.getColumnCount(); i++) {
+                        csv.write(modelSelecionadas.getColumnName(i) + ",");
+                    }
+                    csv.write("\n");
+                    for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
+                        for (int j = 0; j < modelSelecionadas.getColumnCount(); j++) {
+                            csv.write(modelSelecionadas.getValueAt(i, j).toString() + ",");
+                        }
+                        csv.write("\n");
+                    }
+                    csv.close();
+                } catch (Exception error) {
+                    error.printStackTrace();
+                }
+            }
+        });
+        buttonSalvar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    FileWriter csv = new FileWriter(new File("selecionadasSalvo.csv"));
+                    for (int i = 0; i < modelSelecionadas.getColumnCount(); i++) {
+                        csv.write(modelSelecionadas.getColumnName(i) + ",");
+                    }
+                    csv.write("\n");
+                    for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
+                        for (int j = 0; j < modelSelecionadas.getColumnCount(); j++) {
+                            csv.write(modelSelecionadas.getValueAt(i, j).toString() + ",");
+                        }
+                        csv.write("\n");
+                    }
+                    csv.close();
+                } catch (Exception error) {
+                    error.printStackTrace();
+                }
+            }
+        });
         JScrollPane aprovacaoPane = new JScrollPane(aprovacao);
-        aprovacaoPane.setBorder(BorderFactory.createTitledBorder("Aprovação"));
+        aprovacaoPane.setBorder(BorderFactory.createTitledBorder("Estatísticas do Aluno"));
         JScrollPane cursadasPane = new JScrollPane(cursadas);
-        cursadasPane.setBorder(BorderFactory.createTitledBorder("Cursadas"));
+        cursadasPane.setBorder(BorderFactory.createTitledBorder("Disciplinas Cursadas"));
         JScrollPane ofertadasPane = new JScrollPane(ofertadas);
-        ofertadasPane.setBorder(BorderFactory.createTitledBorder("Ofertadas"));
+        ofertadasPane.setBorder(BorderFactory.createTitledBorder("Disciplinas Ofertadas"));
         JScrollPane faltantesPane = new JScrollPane(faltantes);
-        faltantesPane.setBorder(BorderFactory.createTitledBorder("Faltantes"));
-        JScrollPane selecionadasPane = new JScrollPane(selecionadas);
-        selecionadasPane.setBorder(BorderFactory.createTitledBorder("Selecionadas"));
+        faltantesPane.setBorder(BorderFactory.createTitledBorder("Disciplinas Faltantes"));
+        final JScrollPane selecionadasPane = new JScrollPane(selecionadas);
+        selecionadasPane
+                .setBorder(BorderFactory.createTitledBorder("Disciplinas Selecionadas" + " - " + status.getText()));
         panel.add(aprovacaoPane);
         panel.add(cursadasPane);
         panel.add(faltantesPane);
         panel.add(ofertadasPane);
         panel.add(selecionadasPane);
-        panel.add(button);
+        buttonPanel.add(buttonSalvar);
+        buttonPanel.add(buttonEnviar);
+        panel.add(buttonPanel);
         this.add(panel, BorderLayout.CENTER);
-    
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("pedido de quebra");
         this.pack();
         this.setVisible(true);
-
         final ListSelectionModel ofertadasSelectionModel = ofertadas.getSelectionModel();
         ofertadasSelectionModel.addListSelectionListener(new ListSelectionListener() {
             int clickCount = 0;
@@ -62,8 +113,8 @@ public class FrontEnd extends JFrame implements ActionListener {
             public void valueChanged(ListSelectionEvent event) {
                 // verifica se já existe na tabela
                 for (int i = 0; i < modelSelecionadas.getDataVector().size(); i++) {
-                    if (ofertadas.getValueAt(ofertadas.getSelectedRow(), 0).toString() == modelSelecionadas
-                            .getDataVector().get(i).get(0)) {
+                    if (ofertadas.getValueAt(ofertadas.getSelectedRow(), 0).toString().equals(modelSelecionadas
+                            .getDataVector().get(i).get(0))) {
                         exists = true;
                     }
                 }
@@ -72,7 +123,13 @@ public class FrontEnd extends JFrame implements ActionListener {
                 if (!ofertadasSelectionModel.isSelectionEmpty() && clickCount % 2 == 0 && !exists) {
                     modelSelecionadas.addRow(
                             new Object[] { ofertadas.getValueAt(ofertadas.getSelectedRow(), 0).toString(),
+                                    ofertadas.getValueAt(ofertadas.getSelectedRow(), 1).toString(),
+                                    ofertadas.getValueAt(ofertadas.getSelectedRow(), 2).toString(),
                             });
+                    buttonEnviar.setEnabled(verificaRegras());
+                    selecionadasPane
+                            .setBorder(BorderFactory
+                                    .createTitledBorder("Disciplinas Selecionadas" + " - " + status.getText()));
                 }
                 exists = false;
                 clickCount++;
@@ -88,12 +145,54 @@ public class FrontEnd extends JFrame implements ActionListener {
                 // par (para corrigir o bug da tabela que clica duas vezes)
                 if (!selecionadasSelectionModel.isSelectionEmpty() && clickCount % 2 == 0) {
                     modelSelecionadas.removeRow(selecionadas.getSelectedRow());
+                    buttonEnviar.setEnabled(verificaRegras());
+                    selecionadasPane
+                            .setBorder(BorderFactory
+                                    .createTitledBorder("Disciplinas Selecionadas" + " - " + status.getText()));
                 }
                 clickCount++;
             }
         });
-
         this.setSize(700, 800);
+    }
+
+    public boolean verificaRegras() {
+        int tamanhoLista = modelSelecionadas.getDataVector().size();
+        
+        if (tamanhoLista == 0) {
+            status.setText("Nenhuma disciplina foi selecionada");
+            return false;
+        }
+        
+        if (ira >= 8.0 || tamanhoLista <= 3) {
+            status.setText("As Disciplinas serão aprovadas");
+            return true;
+        }
+
+
+        if (desempenho.equals("Ruim") && tamanhoLista > 3) {
+            // máximo de 3 matérias
+            status.setText("Escolha no máximo 3 disciplinas");
+            return false;
+        } else if (desempenho.equals("Médio") && tamanhoLista > 4) {
+            // máximo de 4 matérias
+            status.setText("Escolha no máximo 4 disciplinas");
+            status.setForeground(Color.RED);
+            return false;
+        } else if (desempenho.equals("Bom") && tamanhoLista > 5) {
+            // máximo de 5 matérias
+            status.setText("Escolha no máximo 5 disciplinas");
+            status.setForeground(Color.RED);
+            return false;
+        }
+
+        // remover a matéria de sistemas operacionais (CI215) caso o aluno tenha
+        // reprovado em arquitetura de computadores (CI212)
+        // proibir quebra de barreira para optativas
+        // maximicar a matricula nos periodos mais próximos ao início do curso
+        // matricular o maximo dentro da barreira
+
+        return false;
     }
 
     private JTable selecionadas() {
@@ -102,10 +201,31 @@ public class FrontEnd extends JFrame implements ActionListener {
                 return false;
             }
         };
-        // habilita o sort ao clicar no header
         selecionadasTable.setAutoCreateRowSorter(true);
         modelSelecionadas.addColumn("codigo");
+        modelSelecionadas.addColumn("nome");
+        modelSelecionadas.addColumn("periodo");
         selecionadasTable.setBounds(100, 100, 500, 500);
+        // verifica se existe o arquivo com as disciplinas salvas
+        if (Files.exists(Paths.get("selecionadasSalvo.csv"))) {
+            try {
+                // adiciona as disciplinas salvas na tabela
+                FileReader filereader = new FileReader("selecionadasSalvo.csv");
+                CSVReader csvReader = new CSVReader(filereader);
+                String[] nextRecord;
+                nextRecord = csvReader.readNext();
+                while ((nextRecord = csvReader.readNext()) != null) {
+                    if (nextRecord.length > 0) {
+                    }
+                    modelSelecionadas.addRow(
+                            new Object[] { nextRecord[0].toString(), nextRecord[1].toString(), nextRecord[2].toString(),
+                            });
+                }
+                csvReader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return selecionadasTable;
     }
 
@@ -133,7 +253,6 @@ public class FrontEnd extends JFrame implements ActionListener {
                                 cursada.getStrSituacao() });
             }
         }
-
         cursadasTable.setBounds(100, 100, 500, 500);
         return cursadasTable;
     }
@@ -168,7 +287,6 @@ public class FrontEnd extends JFrame implements ActionListener {
                         });
             }
         }
-
         ofertadasTable.setBounds(100, 100, 500, 500);
         return ofertadasTable;
     }
@@ -177,11 +295,9 @@ public class FrontEnd extends JFrame implements ActionListener {
         JLabel label1 = new JLabel("aprovacao");
         double ultimasAprovadas = 0;
         double ultimasCursadas = 0;
-        double ira = 0;
         double soma = 0;
         double chTotal = 0;
         int reprovacoesFalta = 0;
-
         for (Cursada cursada : listaCursadas.lista) {
             soma = soma + cursada.getMedia() * cursada.getCargaHoraria();
             chTotal += cursada.getCargaHoraria();
@@ -198,7 +314,7 @@ public class FrontEnd extends JFrame implements ActionListener {
         ira = soma / (chTotal * 100);
         double fracao = ultimasAprovadas / ultimasCursadas;
         String porcentagem = (String) String.format("%.2f", ((fracao) * 100));
-
+        // classifica o desempenho do aluno
         if (fracao > (2.0 / 3.0))
             desempenho = "Bom";
         else if (fracao <= 2.0 / 3.0 && fracao > 1.0 / 2.0)
@@ -224,27 +340,23 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelFaltantes.addColumn("codigo");
         modelFaltantes.addColumn("disciplina");
         modelFaltantes.addColumn("periodo");
-
         // pega barreira
         List<String> barreira = new ArrayList<>();
         for (Ofertada ofertada : listaOfertadas.lista) {
             if (ofertada.getperiodoIdeal() != 0 && ofertada.getperiodoIdeal() < 4)
                 barreira.add(ofertada.getCodDisciplina());
         }
-
         // pega aprovadas
         List<String> aprovadas = new ArrayList<>();
         for (Cursada cursada : listaCursadas.lista) {
             if (cursada.getSituacao() == 1)
                 aprovadas.add(cursada.getCodDisciplina());
         }
-
         // pega faltantes
         List<String> faltantes = new ArrayList<>();
         for (String b : barreira)
             if (!aprovadas.contains(b))
                 faltantes.add(b);
-
         for (Ofertada ofertada : listaOfertadas.lista) {
             if (faltantes.contains(ofertada.getCodDisciplina())) {
                 modelFaltantes.addRow(
@@ -252,15 +364,12 @@ public class FrontEnd extends JFrame implements ActionListener {
                                 ofertada.getNomeDisciplina(), ofertada.getperiodoIdeal() });
             }
         }
-
         faltantesTable.setBounds(100, 100, 300, 180);
         return faltantesTable;
     }
 
     public void actionPerformed(ActionEvent e) {
-        // if (e.getSource() == B1) {
-        // String nome = T1.getText();
-        // }
+        System.out.println("aqui");
     }
 
 }
