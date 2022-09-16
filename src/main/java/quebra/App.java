@@ -1,8 +1,7 @@
 package quebra;
-public class App 
-{
-    public static void main( String[] args )
-    {
-		new FrontEnd();
-    }
+
+public class App {
+  public static void main(String[] args) {
+    new FrontEnd();
+  }
 }

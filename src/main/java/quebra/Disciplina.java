@@ -1,24 +1,19 @@
 package quebra;
 
 public class Disciplina {
-    private String codCurso;
-    private String nomeCurso;
     private String nomeDisciplina;
     private String codDisciplina;
     private int cargaHoraria;
     private int numVersao;
     private int tipoDisciplina; // enum
 
-    public Disciplina(String codCurso,
-            String nomeCurso,
+    public Disciplina(
             String nomeDisciplina,
             String codDisciplina,
             int cargaHoraria,
             int numVersao
-            // int tipoDisciplina
-            ) {
-        this.codCurso = codCurso;
-        this.nomeCurso = nomeCurso;
+    // int tipoDisciplina
+    ) {
         this.nomeDisciplina = nomeDisciplina;
         this.codDisciplina = codDisciplina;
         this.cargaHoraria = cargaHoraria;
@@ -27,13 +22,6 @@ public class Disciplina {
     }
 
     // getters
-    public String getCodCurso() {
-        return this.codCurso;
-    }
-
-    public String getNomeCurso() {
-        return this.nomeCurso;
-    }
 
     public String getNomeDisciplina() {
         return this.nomeDisciplina;
@@ -56,13 +44,6 @@ public class Disciplina {
     }
 
     // setters
-    public void getCodCurso(String codCurso) {
-        this.codCurso = codCurso;
-    }
-
-    public void getNomeCurso(String nomeCurso) {
-        this.nomeCurso = nomeCurso;
-    }
 
     public void getNomeDisciplina(String nomeDisciplina) {
         this.nomeDisciplina = nomeDisciplina;

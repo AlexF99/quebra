@@ -32,8 +32,8 @@ public class ListaOfertadas {
 
             while ((nextRecord = csvReader.readNext()) != null) {
                 if (nextRecord.length > 0) {
-                    String codCurso = nextRecord[0];
-                    String nomeCurso = nextRecord[4];
+                    // String codCurso = nextRecord[0];
+                    // String nomeCurso = nextRecord[4];
                     String nomeDisciplina = nextRecord[5];
                     String codDisciplina = nextRecord[3];
                     int cargaHoraria = !nextRecord[9].equals("") ? Integer.parseInt(nextRecord[9]) : 0;
@@ -41,8 +41,6 @@ public class ListaOfertadas {
                     int periodoIdeal = !nextRecord[6].equals("") ? Integer.parseInt(nextRecord[6]) : 0;
                     int numHoras = !nextRecord[7].equals("") ? Integer.parseInt(nextRecord[7]) : 0;
                     Ofertada ofertada = new Ofertada(
-                            codCurso,
-                            nomeCurso,
                             nomeDisciplina,
                             codDisciplina,
                             cargaHoraria,

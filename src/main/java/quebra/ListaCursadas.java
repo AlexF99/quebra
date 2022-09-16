@@ -35,8 +35,6 @@ public class ListaCursadas {
             while ((nextRecord = csvReader.readNext()) != null) {
                 if (nextRecord.length > 0) {
 
-                    String codCurso = nextRecord[2];
-                    String nomeCurso = nextRecord[3];
                     String nomeDisciplina = nextRecord[11];
                     String codDisciplina = nextRecord[10];
                     int cargaHoraria = !nextRecord[12].equals("") ? Integer.parseInt(nextRecord[12]) : 0;
@@ -54,8 +52,6 @@ public class ListaCursadas {
                     String sigla = nextRecord[15];
 
                     Cursada cursada = new Cursada(
-                            codCurso,
-                            nomeCurso,
                             nomeDisciplina,
                             codDisciplina,
                             cargaHoraria,

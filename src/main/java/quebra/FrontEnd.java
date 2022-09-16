@@ -30,9 +30,11 @@ public class FrontEnd extends JFrame implements ActionListener {
     private double ira = 0.0;
     ListaCursadas listaCursadas = ListaCursadas.getInstance();
     ListaOfertadas listaOfertadas = ListaOfertadas.getInstance();
+    Aluno aluno = new Aluno();
+
     public FrontEnd() {
         JTable cursadas = cursadas();
-        final JLabel aprovacao = extraInfo();
+        final JLabel aprovacao = new JLabel("aprovacao");
         JTable faltantes = faltantes();
 
         final JTable selecionadas = selecionadas();
@@ -100,12 +102,15 @@ public class FrontEnd extends JFrame implements ActionListener {
 
                     if (resp == JFileChooser.APPROVE_OPTION) {
                         final String path = chooser.getSelectedFile().getAbsolutePath();
-                        
+
                         listaCursadas.leCursadas(path);
-                        
-                        // Le disciplinas cursadas e as adiciona a tabela 
+
+                        aluno.leAluno(path);
+
+                        selecionadas();
+
+                        // Le disciplinas cursadas e as adiciona a tabela
                         for (Cursada cursada : listaCursadas.lista) {
-                            System.out.println(cursada);
                             if (cursada.getSituacao() != 10) {
                                 modelCursadas.addRow(
                                         new Object[] { cursada.getCodDisciplina(),
@@ -115,7 +120,7 @@ public class FrontEnd extends JFrame implements ActionListener {
                                                 cursada.getStrSituacao() });
                             }
                         }
-                        
+
                         Boolean exists;
                         for (Ofertada ofertada : listaOfertadas.lista) {
                             exists = false;
@@ -133,7 +138,7 @@ public class FrontEnd extends JFrame implements ActionListener {
                                         });
                             }
                         }
-    
+
                         // Calcula e exibe o desempenho do aluno
                         double ultimasAprovadas = 0;
                         double ultimasCursadas = 0;
@@ -143,13 +148,13 @@ public class FrontEnd extends JFrame implements ActionListener {
                         for (Cursada cursada : listaCursadas.lista) {
                             soma = soma + cursada.getMedia() * cursada.getCargaHoraria();
                             chTotal += cursada.getCargaHoraria();
-    
+
                             if (cursada.getPeriodo() == 3) {
                                 ultimasCursadas++;
                                 if (cursada.getSituacao() == 1)
                                     ultimasAprovadas++;
                             }
-    
+
                             if (cursada.getSituacao() == 3)
                                 reprovacoesFalta++;
                         }
@@ -163,10 +168,11 @@ public class FrontEnd extends JFrame implements ActionListener {
                             desempenho = "Médio";
                         else if (fracao < 1.0 / 2.0)
                             desempenho = "Ruim";
-    
+
                         if (ultimasCursadas != 0) {
-                            aprovacao.setText("Aprovação no ultimo periodo: " + porcentagem + "% " + " \nReprovações por falta: "
-                                    + reprovacoesFalta + " \nIRA: " + ira + " Desempenho: " + desempenho);
+                            aprovacao.setText(
+                                    "Aprovação no ultimo periodo: " + porcentagem + "% " + " \nReprovações por falta: "
+                                            + reprovacoesFalta + " \nIRA: " + ira + " Desempenho: " + desempenho);
                         }
                     }
                 } catch (Exception error) {
@@ -174,7 +180,7 @@ public class FrontEnd extends JFrame implements ActionListener {
                 }
             }
         });
-        
+
         buttonImportarGrade.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -187,26 +193,26 @@ public class FrontEnd extends JFrame implements ActionListener {
                     if (resp == JFileChooser.APPROVE_OPTION) {
                         final String path = chooser.getSelectedFile().getAbsolutePath();
                         listaOfertadas.leOfertadas(path);
-    
+
                         List<String> barreira = new ArrayList<>();
                         for (Ofertada ofertada : listaOfertadas.lista) {
                             if (ofertada.getperiodoIdeal() != 0 && ofertada.getperiodoIdeal() < 4)
                                 barreira.add(ofertada.getCodDisciplina());
                         }
-    
+
                         // pega aprovadas
                         List<String> aprovadas = new ArrayList<>();
                         for (Cursada cursada : listaCursadas.lista) {
                             if (cursada.getSituacao() == 1)
                                 aprovadas.add(cursada.getCodDisciplina());
                         }
-    
+
                         // pega faltantes
                         List<String> faltantes = new ArrayList<>();
                         for (String b : barreira)
                             if (!aprovadas.contains(b))
                                 faltantes.add(b);
-    
+
                         for (Ofertada ofertada : listaOfertadas.lista) {
                             if (faltantes.contains(ofertada.getCodDisciplina())) {
                                 modelFaltantes.addRow(
@@ -214,9 +220,9 @@ public class FrontEnd extends JFrame implements ActionListener {
                                                 ofertada.getNomeDisciplina(), ofertada.getperiodoIdeal() });
                             }
                         }
-    
+
                         Boolean exists;
-    
+
                         for (Ofertada ofertada : listaOfertadas.lista) {
                             exists = false;
                             for (Cursada cursada : listaCursadas.lista) {
@@ -238,7 +244,7 @@ public class FrontEnd extends JFrame implements ActionListener {
                 } catch (Exception error) {
                     error.printStackTrace();
                 }
-            } 
+            }
         });
 
         JScrollPane aprovacaoPane = new JScrollPane(aprovacao);
@@ -326,19 +332,20 @@ public class FrontEnd extends JFrame implements ActionListener {
 
         Boolean cursouArq = true;
         Boolean selecionouSO = false;
-        
+
         for (Vector vectorData : disciplinasFaltantes)
             for (Object data : vectorData) {
-                if (data.equals("CI1237")) cursouArq = false;
+                if (data.equals("CI1237"))
+                    cursouArq = false;
                 break;
             }
 
         for (Vector vectorData : disciplinasSelecionadas)
             for (Object data : vectorData) {
-                if (data.equals("CI1215")) selecionouSO = true;
+                if (data.equals("CI1215"))
+                    selecionouSO = true;
                 break;
             }
-        
 
         if (tamanhoLista == 0) {
             status.setText("Nenhuma disciplina foi selecionada");
@@ -349,7 +356,7 @@ public class FrontEnd extends JFrame implements ActionListener {
             status.setText("Você não pode fazer Sistemas Operacionais sem ter feito Arquitetura de Computadores");
             return false;
         }
-        
+
         if (ira >= 8.0 || tamanhoLista <= 3) {
             status.setText("As Disciplinas serão aprovadas");
             return true;
@@ -384,12 +391,16 @@ public class FrontEnd extends JFrame implements ActionListener {
             }
         };
         selecionadasTable.setAutoCreateRowSorter(true);
-        modelSelecionadas.addColumn("codigo");
-        modelSelecionadas.addColumn("nome");
-        modelSelecionadas.addColumn("periodo");
-        selecionadasTable.setBounds(100, 100, 500, 500);
+
+        if (modelSelecionadas.getColumnCount() == 0) {
+            modelSelecionadas.addColumn("codigo");
+            modelSelecionadas.addColumn("nome");
+            modelSelecionadas.addColumn("periodo");
+            selecionadasTable.setBounds(100, 100, 500, 500);
+        }
+
         // verifica se existe o arquivo com as disciplinas salvas
-        if (Files.exists(Paths.get("selecionadasSalvo.csv"))) {
+        if (Files.exists(Paths.get("selecionadasSalvo.csv")) && listaCursadas.lista.size() > 0) {
             try {
                 // adiciona as disciplinas salvas na tabela
                 FileReader filereader = new FileReader("selecionadasSalvo.csv");
@@ -424,17 +435,6 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelCursadas.addColumn("periodo");
         modelCursadas.addColumn("media");
         modelCursadas.addColumn("situação");
-
-        // for (Cursada cursada : listaCursadas.lista) {
-        //     if (cursada.getSituacao() != 10) {
-        //         modelCursadas.addRow(
-        //                 new Object[] { cursada.getCodDisciplina(),
-        //                         cursada.getNomeDisciplina(),
-        //                         cursada.getPeriodo().toString(),
-        //                         cursada.getMedia().toString(),
-        //                         cursada.getStrSituacao() });
-        //     }
-        // }
         cursadasTable.setBounds(100, 100, 500, 500);
         return cursadasTable;
     }
@@ -450,65 +450,8 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelOfertadas.addColumn("periodo ideal");
         // habilita o sort ao clicar no header
         ofertadasTable.setAutoCreateRowSorter(true);
-        // Boolean exists;
-        // // percorre a lista de ofertadas e de cursadas e adiciona na tabela de ofertadas
-        // // apenas as que forem acima do terceiro período e que não foram cursadas
-        // for (Ofertada ofertada : listaOfertadas.lista) {
-        //     exists = false;
-        //     for (Cursada cursada : listaCursadas.lista) {
-        //         if (ofertada.getCodDisciplina().equals(cursada.getCodDisciplina())
-        //                 && cursada.getStrSituacao().equals("aprovado")) {
-        //             exists = true;
-        //         }
-        //     }
-        //     if (!exists && ofertada.getperiodoIdeal() > 3) {
-        //         modelOfertadas.addRow(
-        //                 new Object[] { ofertada.getCodDisciplina(),
-        //                         ofertada.getNomeDisciplina(),
-        //                         ofertada.getperiodoIdeal(),
-        //                 });
-        //     }
-        // }
         ofertadasTable.setBounds(100, 100, 500, 500);
         return ofertadasTable;
-    }
-
-    private JLabel extraInfo() {
-        JLabel label1 = new JLabel("aprovacao");
-        // double ultimasAprovadas = 0;
-        // double ultimasCursadas = 0;
-        // double soma = 0;
-        // double chTotal = 0;
-        // int reprovacoesFalta = 0;
-        // for (Cursada cursada : listaCursadas.lista) {
-        //     soma = soma + cursada.getMedia() * cursada.getCargaHoraria();
-        //     chTotal += cursada.getCargaHoraria();
-
-        //     if (cursada.getPeriodo() == 3) {
-        //         ultimasCursadas++;
-        //         if (cursada.getSituacao() == 1)
-        //             ultimasAprovadas++;
-        //     }
-
-        //     if (cursada.getSituacao() == 3)
-        //         reprovacoesFalta++;
-        // }
-        // ira = soma / (chTotal * 100);
-        // double fracao = ultimasAprovadas / ultimasCursadas;
-        // String porcentagem = (String) String.format("%.2f", ((fracao) * 100));
-        // // classifica o desempenho do aluno
-        // if (fracao > (2.0 / 3.0))
-        //     desempenho = "Bom";
-        // else if (fracao <= 2.0 / 3.0 && fracao > 1.0 / 2.0)
-        //     desempenho = "Médio";
-        // else if (fracao < 1.0 / 2.0)
-        //     desempenho = "Ruim";
-
-        // if (ultimasCursadas != 0) {
-        //     label1.setText("Aprovação no ultimo periodo: " + porcentagem + "% " + " \nReprovações por falta: "
-        //             + reprovacoesFalta + " \nIRA: " + ira + " Desempenho: " + desempenho);
-        // }
-        return label1;
     }
 
     private JTable faltantes() {
@@ -522,34 +465,6 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelFaltantes.addColumn("codigo");
         modelFaltantes.addColumn("disciplina");
         modelFaltantes.addColumn("periodo");
-
-        // pega barreira
-        // List<String> barreira = new ArrayList<>();
-        // for (Ofertada ofertada : listaOfertadas.lista) {
-        //     if (ofertada.getperiodoIdeal() != 0 && ofertada.getperiodoIdeal() < 4)
-        //         barreira.add(ofertada.getCodDisciplina());
-        // }
-
-        // // pega aprovadas
-        // List<String> aprovadas = new ArrayList<>();
-        // for (Cursada cursada : listaCursadas.lista) {
-        //     if (cursada.getSituacao() == 1)
-        //         aprovadas.add(cursada.getCodDisciplina());
-        // }
-
-        // // pega faltantes
-        // List<String> faltantes = new ArrayList<>();
-        // for (String b : barreira)
-        //     if (!aprovadas.contains(b))
-        //         faltantes.add(b);
-
-        // for (Ofertada ofertada : listaOfertadas.lista) {
-        //     if (faltantes.contains(ofertada.getCodDisciplina())) {
-        //         modelFaltantes.addRow(
-        //                 new Object[] { ofertada.getCodDisciplina(),
-        //                         ofertada.getNomeDisciplina(), ofertada.getperiodoIdeal() });
-        //     }
-        // }
 
         faltantesTable.setBounds(100, 100, 300, 180);
         return faltantesTable;

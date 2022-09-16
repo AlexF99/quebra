@@ -1,8 +1,7 @@
 package quebra;
 
 public class Cursada extends Disciplina {
-    String grr;
-    String nomeAluno;
+
     String sigla;
     Integer periodo;
     int ano;
@@ -11,8 +10,6 @@ public class Cursada extends Disciplina {
     int frequencia;
 
     public Cursada(
-            String codCurso,
-            String nomeCurso,
             String nomeDisciplina,
             String codDisciplina,
             int cargaHoraria,
@@ -26,9 +23,8 @@ public class Cursada extends Disciplina {
             Integer media,
             int frequencia,
             String sigla) {
-        super(codCurso, nomeCurso, nomeDisciplina, codDisciplina, cargaHoraria, numVersao);
-        this.grr = grr;
-        this.nomeAluno = nomeAluno;
+        super(nomeDisciplina, codDisciplina, cargaHoraria, numVersao);
+
         this.periodo = periodo;
         this.ano = ano;
         this.situacao = situacao;
@@ -38,14 +34,6 @@ public class Cursada extends Disciplina {
     }
 
     // getters
-    public String getGrr() {
-        return this.grr;
-    }
-
-    public String getNomeAluno() {
-        return this.nomeAluno;
-    }
-
     public String getSigla() {
         return this.sigla;
     }
@@ -87,14 +75,6 @@ public class Cursada extends Disciplina {
     }
 
     // setters
-    public void setGrr(String grr) {
-        this.grr = grr;
-    }
-
-    public void setNomeAluno(String nomeAluno) {
-        this.nomeAluno = nomeAluno;
-    }
-
     public void setSigla(String sigla) {
         this.sigla = sigla;
     }
