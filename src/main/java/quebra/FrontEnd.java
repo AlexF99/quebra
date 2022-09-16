@@ -319,6 +319,10 @@ public class FrontEnd extends JFrame {
     public void gerarPedido() {
         try {
             FileWriter pedido = new FileWriter(new File("pedido.txt"));
+
+            pedido.write("PEDIDO DE QUEBRA DE BARREIRA \n");
+            pedido.write("------------------------------------------\n");
+            
             pedido.write("Aluno: " + aluno.nomeAluno + "\n");
             pedido.write("GRR: " + aluno.grr + "\n");
             pedido.write("Código do curso: " + aluno.codCurso + "\n");
@@ -326,10 +330,10 @@ public class FrontEnd extends JFrame {
 
             pedido.write("\n");
 
-            pedido.write("Disciplinas faltantes para a barreira:\n");
-            for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
-                pedido.write(modelSelecionadas.getValueAt(i, 0).toString() + ", ");
-                pedido.write(modelSelecionadas.getValueAt(i, 1).toString());
+            pedido.write("Disciplinas faltantes para a quebra:\n");
+            for (int i = 0; i < modelFaltantes.getRowCount(); i++) {
+                pedido.write(modelFaltantes.getValueAt(i, 0).toString() + ", ");
+                pedido.write(modelFaltantes.getValueAt(i, 1).toString());
                 pedido.write("\n");
             }
             pedido.write("\n");
