@@ -8,11 +8,13 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Vector;
 import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import com.opencsv.CSVReader;
@@ -22,6 +24,7 @@ public class FrontEnd extends JFrame implements ActionListener {
     private DefaultTableModel modelFaltantes = new DefaultTableModel();
     private DefaultTableModel modelOfertadas = new DefaultTableModel();
     private DefaultTableModel modelSelecionadas = new DefaultTableModel();
+
     private JLabel status = new JLabel();
     private String desempenho = "";
     private double ira = 0.0;
@@ -29,14 +32,19 @@ public class FrontEnd extends JFrame implements ActionListener {
     ListaOfertadas listaOfertadas = ListaOfertadas.getInstance();
     public FrontEnd() {
         JTable cursadas = cursadas();
-        JLabel aprovacao = extraInfo();
+        final JLabel aprovacao = extraInfo();
         JTable faltantes = faltantes();
+
         final JTable selecionadas = selecionadas();
         final JTable ofertadas = ofertadas();
         JPanel panel = new JPanel();
         JPanel buttonPanel = new JPanel();
+        JPanel importsPanel = new JPanel();
+        importsPanel.setLayout(new BoxLayout(importsPanel, 0));
         buttonPanel.setLayout(new BoxLayout(buttonPanel, 0));
         panel.setLayout(new BoxLayout(panel, 1));
+        final JButton buttonImportarHist = new JButton("Importar histórico");
+        final JButton buttonImportarGrade = new JButton("Importar grade");
         final JButton buttonEnviar = new JButton("Enviar");
         JButton buttonSalvar = new JButton("Salvar");
         buttonEnviar.setEnabled(verificaRegras());
@@ -81,6 +89,158 @@ public class FrontEnd extends JFrame implements ActionListener {
                 }
             }
         });
+        buttonImportarHist.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    JFileChooser chooser = new JFileChooser();
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter("Selecione um arquivo csv", "csv");
+
+                    chooser.setFileFilter(filter);
+                    int resp = chooser.showOpenDialog(null);
+
+                    if (resp == JFileChooser.APPROVE_OPTION) {
+                        final String path = chooser.getSelectedFile().getAbsolutePath();
+                        
+                        listaCursadas.leCursadas(path);
+                        
+                        // Le disciplinas cursadas e as adiciona a tabela 
+                        for (Cursada cursada : listaCursadas.lista) {
+                            System.out.println(cursada);
+                            if (cursada.getSituacao() != 10) {
+                                modelCursadas.addRow(
+                                        new Object[] { cursada.getCodDisciplina(),
+                                                cursada.getNomeDisciplina(),
+                                                cursada.getPeriodo().toString(),
+                                                cursada.getMedia().toString(),
+                                                cursada.getStrSituacao() });
+                            }
+                        }
+                        
+                        Boolean exists;
+                        for (Ofertada ofertada : listaOfertadas.lista) {
+                            exists = false;
+                            for (Cursada cursada : listaCursadas.lista) {
+                                if (ofertada.getCodDisciplina().equals(cursada.getCodDisciplina())
+                                        && cursada.getStrSituacao().equals("aprovado")) {
+                                    exists = true;
+                                }
+                            }
+                            if (!exists && ofertada.getperiodoIdeal() > 3) {
+                                modelOfertadas.addRow(
+                                        new Object[] { ofertada.getCodDisciplina(),
+                                                ofertada.getNomeDisciplina(),
+                                                ofertada.getperiodoIdeal(),
+                                        });
+                            }
+                        }
+    
+                        // Calcula e exibe o desempenho do aluno
+                        double ultimasAprovadas = 0;
+                        double ultimasCursadas = 0;
+                        double soma = 0;
+                        double chTotal = 0;
+                        int reprovacoesFalta = 0;
+                        for (Cursada cursada : listaCursadas.lista) {
+                            soma = soma + cursada.getMedia() * cursada.getCargaHoraria();
+                            chTotal += cursada.getCargaHoraria();
+    
+                            if (cursada.getPeriodo() == 3) {
+                                ultimasCursadas++;
+                                if (cursada.getSituacao() == 1)
+                                    ultimasAprovadas++;
+                            }
+    
+                            if (cursada.getSituacao() == 3)
+                                reprovacoesFalta++;
+                        }
+                        ira = soma / (chTotal * 100);
+                        double fracao = ultimasAprovadas / ultimasCursadas;
+                        String porcentagem = (String) String.format("%.2f", ((fracao) * 100));
+                        // classifica o desempenho do aluno
+                        if (fracao > (2.0 / 3.0))
+                            desempenho = "Bom";
+                        else if (fracao <= 2.0 / 3.0 && fracao > 1.0 / 2.0)
+                            desempenho = "Médio";
+                        else if (fracao < 1.0 / 2.0)
+                            desempenho = "Ruim";
+    
+                        if (ultimasCursadas != 0) {
+                            aprovacao.setText("Aprovação no ultimo periodo: " + porcentagem + "% " + " \nReprovações por falta: "
+                                    + reprovacoesFalta + " \nIRA: " + ira + " Desempenho: " + desempenho);
+                        }
+                    }
+                } catch (Exception error) {
+                    error.printStackTrace();
+                }
+            }
+        });
+        
+        buttonImportarGrade.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    JFileChooser chooser = new JFileChooser();
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter("Selecione um arquivo csv", "csv");
+
+                    chooser.setFileFilter(filter);
+                    int resp = chooser.showOpenDialog(null);
+
+                    if (resp == JFileChooser.APPROVE_OPTION) {
+                        final String path = chooser.getSelectedFile().getAbsolutePath();
+                        listaOfertadas.leOfertadas(path);
+    
+                        List<String> barreira = new ArrayList<>();
+                        for (Ofertada ofertada : listaOfertadas.lista) {
+                            if (ofertada.getperiodoIdeal() != 0 && ofertada.getperiodoIdeal() < 4)
+                                barreira.add(ofertada.getCodDisciplina());
+                        }
+    
+                        // pega aprovadas
+                        List<String> aprovadas = new ArrayList<>();
+                        for (Cursada cursada : listaCursadas.lista) {
+                            if (cursada.getSituacao() == 1)
+                                aprovadas.add(cursada.getCodDisciplina());
+                        }
+    
+                        // pega faltantes
+                        List<String> faltantes = new ArrayList<>();
+                        for (String b : barreira)
+                            if (!aprovadas.contains(b))
+                                faltantes.add(b);
+    
+                        for (Ofertada ofertada : listaOfertadas.lista) {
+                            if (faltantes.contains(ofertada.getCodDisciplina())) {
+                                modelFaltantes.addRow(
+                                        new Object[] { ofertada.getCodDisciplina(),
+                                                ofertada.getNomeDisciplina(), ofertada.getperiodoIdeal() });
+                            }
+                        }
+    
+                        Boolean exists;
+    
+                        for (Ofertada ofertada : listaOfertadas.lista) {
+                            exists = false;
+                            for (Cursada cursada : listaCursadas.lista) {
+                                if (ofertada.getCodDisciplina().equals(cursada.getCodDisciplina())
+                                        && cursada.getStrSituacao().equals("aprovado")) {
+                                    exists = true;
+                                }
+                            }
+                            if (!exists && ofertada.getperiodoIdeal() > 3) {
+                                modelOfertadas.addRow(
+                                        new Object[] { ofertada.getCodDisciplina(),
+                                                ofertada.getNomeDisciplina(),
+                                                ofertada.getperiodoIdeal(),
+                                        });
+                            }
+                        }
+                    }
+
+                } catch (Exception error) {
+                    error.printStackTrace();
+                }
+            } 
+        });
+
         JScrollPane aprovacaoPane = new JScrollPane(aprovacao);
         aprovacaoPane.setBorder(BorderFactory.createTitledBorder("Estatísticas do Aluno"));
         JScrollPane cursadasPane = new JScrollPane(cursadas);
@@ -92,6 +252,9 @@ public class FrontEnd extends JFrame implements ActionListener {
         final JScrollPane selecionadasPane = new JScrollPane(selecionadas);
         selecionadasPane
                 .setBorder(BorderFactory.createTitledBorder("Disciplinas Selecionadas" + " - " + status.getText()));
+        importsPanel.add(buttonImportarHist);
+        importsPanel.add(buttonImportarGrade);
+        panel.add(importsPanel);
         panel.add(aprovacaoPane);
         panel.add(cursadasPane);
         panel.add(faltantesPane);
@@ -158,9 +321,32 @@ public class FrontEnd extends JFrame implements ActionListener {
 
     public boolean verificaRegras() {
         int tamanhoLista = modelSelecionadas.getDataVector().size();
+        Vector<Vector> disciplinasFaltantes = modelFaltantes.getDataVector();
+        Vector<Vector> disciplinasSelecionadas = modelSelecionadas.getDataVector();
+
+        Boolean cursouArq = true;
+        Boolean selecionouSO = false;
         
+        for (Vector vectorData : disciplinasFaltantes)
+            for (Object data : vectorData) {
+                if (data.equals("CI1237")) cursouArq = false;
+                break;
+            }
+
+        for (Vector vectorData : disciplinasSelecionadas)
+            for (Object data : vectorData) {
+                if (data.equals("CI1215")) selecionouSO = true;
+                break;
+            }
+        
+
         if (tamanhoLista == 0) {
             status.setText("Nenhuma disciplina foi selecionada");
+            return false;
+        }
+
+        if (!cursouArq && selecionouSO) {
+            status.setText("Você não pode fazer Sistemas Operacionais sem ter feito Arquitetura de Computadores");
             return false;
         }
         
@@ -168,7 +354,6 @@ public class FrontEnd extends JFrame implements ActionListener {
             status.setText("As Disciplinas serão aprovadas");
             return true;
         }
-
 
         if (desempenho.equals("Ruim") && tamanhoLista > 3) {
             // máximo de 3 matérias
@@ -186,9 +371,6 @@ public class FrontEnd extends JFrame implements ActionListener {
             return false;
         }
 
-        // remover a matéria de sistemas operacionais (CI215) caso o aluno tenha
-        // reprovado em arquitetura de computadores (CI212)
-        // proibir quebra de barreira para optativas
         // maximicar a matricula nos periodos mais próximos ao início do curso
         // matricular o maximo dentro da barreira
 
@@ -243,16 +425,16 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelCursadas.addColumn("media");
         modelCursadas.addColumn("situação");
 
-        for (Cursada cursada : listaCursadas.lista) {
-            if (cursada.getSituacao() != 10) {
-                modelCursadas.addRow(
-                        new Object[] { cursada.getCodDisciplina(),
-                                cursada.getNomeDisciplina(),
-                                cursada.getPeriodo().toString(),
-                                cursada.getMedia().toString(),
-                                cursada.getStrSituacao() });
-            }
-        }
+        // for (Cursada cursada : listaCursadas.lista) {
+        //     if (cursada.getSituacao() != 10) {
+        //         modelCursadas.addRow(
+        //                 new Object[] { cursada.getCodDisciplina(),
+        //                         cursada.getNomeDisciplina(),
+        //                         cursada.getPeriodo().toString(),
+        //                         cursada.getMedia().toString(),
+        //                         cursada.getStrSituacao() });
+        //     }
+        // }
         cursadasTable.setBounds(100, 100, 500, 500);
         return cursadasTable;
     }
@@ -268,64 +450,64 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelOfertadas.addColumn("periodo ideal");
         // habilita o sort ao clicar no header
         ofertadasTable.setAutoCreateRowSorter(true);
-        Boolean exists;
-        // percorre a lista de ofertadas e de cursadas e adiciona na tabela de ofertadas
-        // apenas as que forem acima do terceiro período e que não foram cursadas
-        for (Ofertada ofertada : listaOfertadas.lista) {
-            exists = false;
-            for (Cursada cursada : listaCursadas.lista) {
-                if (ofertada.getCodDisciplina().equals(cursada.getCodDisciplina())
-                        && cursada.getStrSituacao().equals("aprovado")) {
-                    exists = true;
-                }
-            }
-            if (!exists && ofertada.getperiodoIdeal() > 3) {
-                modelOfertadas.addRow(
-                        new Object[] { ofertada.getCodDisciplina(),
-                                ofertada.getNomeDisciplina(),
-                                ofertada.getperiodoIdeal(),
-                        });
-            }
-        }
+        // Boolean exists;
+        // // percorre a lista de ofertadas e de cursadas e adiciona na tabela de ofertadas
+        // // apenas as que forem acima do terceiro período e que não foram cursadas
+        // for (Ofertada ofertada : listaOfertadas.lista) {
+        //     exists = false;
+        //     for (Cursada cursada : listaCursadas.lista) {
+        //         if (ofertada.getCodDisciplina().equals(cursada.getCodDisciplina())
+        //                 && cursada.getStrSituacao().equals("aprovado")) {
+        //             exists = true;
+        //         }
+        //     }
+        //     if (!exists && ofertada.getperiodoIdeal() > 3) {
+        //         modelOfertadas.addRow(
+        //                 new Object[] { ofertada.getCodDisciplina(),
+        //                         ofertada.getNomeDisciplina(),
+        //                         ofertada.getperiodoIdeal(),
+        //                 });
+        //     }
+        // }
         ofertadasTable.setBounds(100, 100, 500, 500);
         return ofertadasTable;
     }
 
     private JLabel extraInfo() {
         JLabel label1 = new JLabel("aprovacao");
-        double ultimasAprovadas = 0;
-        double ultimasCursadas = 0;
-        double soma = 0;
-        double chTotal = 0;
-        int reprovacoesFalta = 0;
-        for (Cursada cursada : listaCursadas.lista) {
-            soma = soma + cursada.getMedia() * cursada.getCargaHoraria();
-            chTotal += cursada.getCargaHoraria();
+        // double ultimasAprovadas = 0;
+        // double ultimasCursadas = 0;
+        // double soma = 0;
+        // double chTotal = 0;
+        // int reprovacoesFalta = 0;
+        // for (Cursada cursada : listaCursadas.lista) {
+        //     soma = soma + cursada.getMedia() * cursada.getCargaHoraria();
+        //     chTotal += cursada.getCargaHoraria();
 
-            if (cursada.getPeriodo() == 3) {
-                ultimasCursadas++;
-                if (cursada.getSituacao() == 1)
-                    ultimasAprovadas++;
-            }
+        //     if (cursada.getPeriodo() == 3) {
+        //         ultimasCursadas++;
+        //         if (cursada.getSituacao() == 1)
+        //             ultimasAprovadas++;
+        //     }
 
-            if (cursada.getSituacao() == 3)
-                reprovacoesFalta++;
-        }
-        ira = soma / (chTotal * 100);
-        double fracao = ultimasAprovadas / ultimasCursadas;
-        String porcentagem = (String) String.format("%.2f", ((fracao) * 100));
-        // classifica o desempenho do aluno
-        if (fracao > (2.0 / 3.0))
-            desempenho = "Bom";
-        else if (fracao <= 2.0 / 3.0 && fracao > 1.0 / 2.0)
-            desempenho = "Médio";
-        else if (fracao < 1.0 / 2.0)
-            desempenho = "Ruim";
+        //     if (cursada.getSituacao() == 3)
+        //         reprovacoesFalta++;
+        // }
+        // ira = soma / (chTotal * 100);
+        // double fracao = ultimasAprovadas / ultimasCursadas;
+        // String porcentagem = (String) String.format("%.2f", ((fracao) * 100));
+        // // classifica o desempenho do aluno
+        // if (fracao > (2.0 / 3.0))
+        //     desempenho = "Bom";
+        // else if (fracao <= 2.0 / 3.0 && fracao > 1.0 / 2.0)
+        //     desempenho = "Médio";
+        // else if (fracao < 1.0 / 2.0)
+        //     desempenho = "Ruim";
 
-        if (ultimasCursadas != 0) {
-            label1.setText("Aprovação no ultimo periodo: " + porcentagem + "% " + " \nReprovações por falta: "
-                    + reprovacoesFalta + " \nIRA: " + ira + " Desempenho: " + desempenho);
-        }
+        // if (ultimasCursadas != 0) {
+        //     label1.setText("Aprovação no ultimo periodo: " + porcentagem + "% " + " \nReprovações por falta: "
+        //             + reprovacoesFalta + " \nIRA: " + ira + " Desempenho: " + desempenho);
+        // }
         return label1;
     }
 
@@ -340,30 +522,35 @@ public class FrontEnd extends JFrame implements ActionListener {
         modelFaltantes.addColumn("codigo");
         modelFaltantes.addColumn("disciplina");
         modelFaltantes.addColumn("periodo");
+
         // pega barreira
-        List<String> barreira = new ArrayList<>();
-        for (Ofertada ofertada : listaOfertadas.lista) {
-            if (ofertada.getperiodoIdeal() != 0 && ofertada.getperiodoIdeal() < 4)
-                barreira.add(ofertada.getCodDisciplina());
-        }
-        // pega aprovadas
-        List<String> aprovadas = new ArrayList<>();
-        for (Cursada cursada : listaCursadas.lista) {
-            if (cursada.getSituacao() == 1)
-                aprovadas.add(cursada.getCodDisciplina());
-        }
-        // pega faltantes
-        List<String> faltantes = new ArrayList<>();
-        for (String b : barreira)
-            if (!aprovadas.contains(b))
-                faltantes.add(b);
-        for (Ofertada ofertada : listaOfertadas.lista) {
-            if (faltantes.contains(ofertada.getCodDisciplina())) {
-                modelFaltantes.addRow(
-                        new Object[] { ofertada.getCodDisciplina(),
-                                ofertada.getNomeDisciplina(), ofertada.getperiodoIdeal() });
-            }
-        }
+        // List<String> barreira = new ArrayList<>();
+        // for (Ofertada ofertada : listaOfertadas.lista) {
+        //     if (ofertada.getperiodoIdeal() != 0 && ofertada.getperiodoIdeal() < 4)
+        //         barreira.add(ofertada.getCodDisciplina());
+        // }
+
+        // // pega aprovadas
+        // List<String> aprovadas = new ArrayList<>();
+        // for (Cursada cursada : listaCursadas.lista) {
+        //     if (cursada.getSituacao() == 1)
+        //         aprovadas.add(cursada.getCodDisciplina());
+        // }
+
+        // // pega faltantes
+        // List<String> faltantes = new ArrayList<>();
+        // for (String b : barreira)
+        //     if (!aprovadas.contains(b))
+        //         faltantes.add(b);
+
+        // for (Ofertada ofertada : listaOfertadas.lista) {
+        //     if (faltantes.contains(ofertada.getCodDisciplina())) {
+        //         modelFaltantes.addRow(
+        //                 new Object[] { ofertada.getCodDisciplina(),
+        //                         ofertada.getNomeDisciplina(), ofertada.getperiodoIdeal() });
+        //     }
+        // }
+
         faltantesTable.setBounds(100, 100, 300, 180);
         return faltantesTable;
     }
