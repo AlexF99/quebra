@@ -19,7 +19,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.opencsv.CSVReader;
 
-public class FrontEnd extends JFrame implements ActionListener {
+public class FrontEnd extends JFrame {
     private DefaultTableModel modelCursadas = new DefaultTableModel();
     private DefaultTableModel modelFaltantes = new DefaultTableModel();
     private DefaultTableModel modelOfertadas = new DefaultTableModel();
@@ -53,42 +53,14 @@ public class FrontEnd extends JFrame implements ActionListener {
         // ação do botão enviar - Salva as disciplinas em um CSV
         buttonEnviar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    FileWriter csv = new FileWriter(new File("selecionadasEnvio.csv"));
-                    for (int i = 0; i < modelSelecionadas.getColumnCount(); i++) {
-                        csv.write(modelSelecionadas.getColumnName(i) + ",");
-                    }
-                    csv.write("\n");
-                    for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
-                        for (int j = 0; j < modelSelecionadas.getColumnCount(); j++) {
-                            csv.write(modelSelecionadas.getValueAt(i, j).toString() + ",");
-                        }
-                        csv.write("\n");
-                    }
-                    csv.close();
-                } catch (Exception error) {
-                    error.printStackTrace();
-                }
+                salvarEnviadas();
+                gerarPedido();
             }
         });
         buttonSalvar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    FileWriter csv = new FileWriter(new File("selecionadasSalvo.csv"));
-                    for (int i = 0; i < modelSelecionadas.getColumnCount(); i++) {
-                        csv.write(modelSelecionadas.getColumnName(i) + ",");
-                    }
-                    csv.write("\n");
-                    for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
-                        for (int j = 0; j < modelSelecionadas.getColumnCount(); j++) {
-                            csv.write(modelSelecionadas.getValueAt(i, j).toString() + ",");
-                        }
-                        csv.write("\n");
-                    }
-                    csv.close();
-                } catch (Exception error) {
-                    error.printStackTrace();
-                }
+                salvarEnviadas();
+                JOptionPane.showMessageDialog(null, "Pedido salvo!");
             }
         });
         buttonImportarHist.addActionListener(new ActionListener() {
@@ -104,10 +76,10 @@ public class FrontEnd extends JFrame implements ActionListener {
                         final String path = chooser.getSelectedFile().getAbsolutePath();
 
                         listaCursadas.leCursadas(path);
-
                         aluno.leAluno(path);
-
                         selecionadas();
+
+                        buttonEnviar.setEnabled(verificaRegras());
 
                         // Le disciplinas cursadas e as adiciona a tabela
                         for (Cursada cursada : listaCursadas.lista) {
@@ -325,6 +297,60 @@ public class FrontEnd extends JFrame implements ActionListener {
         this.setSize(700, 800);
     }
 
+    public void salvarEnviadas() {
+        try {
+            FileWriter csv = new FileWriter(new File("selecionadasSalvo.csv"));
+            for (int i = 0; i < modelSelecionadas.getColumnCount(); i++) {
+                csv.write(modelSelecionadas.getColumnName(i) + ",");
+            }
+            csv.write("\n");
+            for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
+                for (int j = 0; j < modelSelecionadas.getColumnCount(); j++) {
+                    csv.write(modelSelecionadas.getValueAt(i, j).toString() + ",");
+                }
+                csv.write("\n");
+            }
+            csv.close();
+        } catch (Exception error) {
+            error.printStackTrace();
+        }
+    }
+
+    public void gerarPedido() {
+        try {
+            FileWriter pedido = new FileWriter(new File("pedido.txt"));
+            pedido.write("Aluno: " + aluno.nomeAluno + "\n");
+            pedido.write("GRR: " + aluno.grr + "\n");
+            pedido.write("Código do curso: " + aluno.codCurso + "\n");
+            pedido.write("Nome do curso: " + aluno.nomeCurso + "\n");
+
+            pedido.write("\n");
+
+            pedido.write("Disciplinas faltantes para a barreira:\n");
+            for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
+                pedido.write(modelSelecionadas.getValueAt(i, 0).toString() + ", ");
+                pedido.write(modelSelecionadas.getValueAt(i, 1).toString());
+                pedido.write("\n");
+            }
+            pedido.write("\n");
+
+            pedido.write("Disciplinas pedidas:\n");
+            for (int i = 0; i < modelSelecionadas.getRowCount(); i++) {
+                for (int j = 0; j < modelSelecionadas.getColumnCount() - 1; j++) {
+                    pedido.write(modelSelecionadas.getValueAt(i, j).toString());
+                    if (j < modelSelecionadas.getColumnCount() - 2)
+                        pedido.write(", ");
+                }
+                pedido.write("\n");
+            }
+
+            pedido.close();
+            JOptionPane.showMessageDialog(null, "Pedido enviado!");
+        } catch (Exception error) {
+            error.printStackTrace();
+        }
+    }
+
     public boolean verificaRegras() {
         int tamanhoLista = modelSelecionadas.getDataVector().size();
         Vector<Vector> disciplinasFaltantes = modelFaltantes.getDataVector();
@@ -469,9 +495,4 @@ public class FrontEnd extends JFrame implements ActionListener {
         faltantesTable.setBounds(100, 100, 300, 180);
         return faltantesTable;
     }
-
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("aqui");
-    }
-
 }
